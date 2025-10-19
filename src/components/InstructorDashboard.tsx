@@ -42,6 +42,8 @@ import {
     Trash2,
     Plus,
     RefreshCw,
+    Upload,
+    Image as ImageIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
@@ -881,6 +883,78 @@ export function InstructorDashboard({ onNavigate }: InstructorDashboardProps) {
                                                             <SelectItem value="needs-repair">Needs Repair</SelectItem>
                                                         </SelectContent>
                                                     </Select>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label htmlFor="tool-image">Tool Image</Label>
+                                                <div className="space-y-3">
+                                                    {newToolData.image && (
+                                                        <div className="relative w-full h-32 rounded-lg border-2 border-slate-200 overflow-hidden bg-slate-50">
+                                                            <ImageWithFallback
+                                                                src={newToolData.image}
+                                                                alt="Tool preview"
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="destructive"
+                                                                size="sm"
+                                                                className="absolute top-2 right-2"
+                                                                onClick={() => setNewToolData({ ...newToolData, image: "" })}
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center gap-2">
+                                                        <Input
+                                                            id="tool-image"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="hidden"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    const reader = new FileReader();
+                                                                    reader.onloadend = () => {
+                                                                        setNewToolData({
+                                                                            ...newToolData,
+                                                                            image: reader.result as string,
+                                                                        });
+                                                                    };
+                                                                    reader.readAsDataURL(file);
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            className="flex-1"
+                                                            onClick={() => document.getElementById("tool-image")?.click()}
+                                                        >
+                                                            <Upload className="w-4 h-4 mr-2" />
+                                                            Upload Image
+                                                        </Button>
+                                                        {!newToolData.image && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="flex-1"
+                                                                onClick={() =>
+                                                                    setNewToolData({
+                                                                        ...newToolData,
+                                                                        image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=400",
+                                                                    })
+                                                                }
+                                                            >
+                                                                <ImageIcon className="w-4 h-4 mr-2" />
+                                                                Use Placeholder
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Upload an image of the tool or use a placeholder image
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1917,6 +1991,75 @@ export function InstructorDashboard({ onNavigate }: InstructorDashboardProps) {
                                             <SelectItem value="needs-repair">Needs Repair</SelectItem>
                                         </SelectContent>
                                     </Select>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-tool-image">Tool Image</Label>
+                                <div className="space-y-3">
+                                    {editingTool.image && (
+                                        <div className="relative w-full h-32 rounded-lg border-2 border-slate-200 overflow-hidden bg-slate-50">
+                                            <ImageWithFallback
+                                                src={editingTool.image}
+                                                alt="Tool preview"
+                                                className="w-full h-full object-cover"
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                size="sm"
+                                                className="absolute top-2 right-2"
+                                                onClick={() => setEditingTool({ ...editingTool, image: "" })}
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </Button>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center gap-2">
+                                        <Input
+                                            id="edit-tool-image"
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        setEditingTool({ ...editingTool, image: reader.result as string });
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            className="flex-1"
+                                            onClick={() => document.getElementById("edit-tool-image")?.click()}
+                                        >
+                                            <Upload className="w-4 h-4 mr-2" />
+                                            {editingTool.image ? "Change Image" : "Upload Image"}
+                                        </Button>
+                                        {!editingTool.image && (
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                className="flex-1"
+                                                onClick={() =>
+                                                    setEditingTool({
+                                                        ...editingTool,
+                                                        image: "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=400",
+                                                    })
+                                                }
+                                            >
+                                                <ImageIcon className="w-4 h-4 mr-2" />
+                                                Use Placeholder
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <p className="text-xs text-muted-foreground">
+                                        Upload an image of the tool or use a placeholder image
+                                    </p>
                                 </div>
                             </div>
                         </div>
