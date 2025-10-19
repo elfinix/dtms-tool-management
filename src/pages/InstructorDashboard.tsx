@@ -6,9 +6,9 @@ import { SearchBar } from "../components/dashboard/SearchBar";
 import { FilterBar } from "../components/dashboard/FilterBar";
 import { ToolInventoryGrid } from "../components/instructor/ToolInventoryGrid";
 import { ToolFormDialog } from "../components/instructor/ToolFormDialog";
-import { BorrowedToolsTable } from "../components/instructor/BorrowedToolsTable";
 import { QRCodeGenerator } from "../components/instructor/QRCodeGenerator";
 import { InstructorReportsTab } from "../components/instructor/InstructorReportsTab";
+import { StudentToolsGroup, GroupedStudent } from "../components/instructor/StudentToolsGroup";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -145,6 +145,68 @@ export function InstructorDashboard({ onNavigate }: InstructorDashboardProps) {
 
     const returnedTools = getReturnedToolsByInstructor(INSTRUCTOR_ID);
 
+    // Group borrowed tools by student
+    const groupedBorrowedStudents = useMemo((): GroupedStudent[] => {
+        const studentMap = new Map<string, GroupedStudent>();
+
+        borrowedTools.forEach((tool) => {
+            if (!studentMap.has(tool.studentId)) {
+                studentMap.set(tool.studentId, {
+                    studentId: tool.studentId,
+                    studentName: tool.studentName,
+                    section: tool.section,
+                    tools: [],
+                    totalTools: 0,
+                });
+            }
+
+            const student = studentMap.get(tool.studentId)!;
+            student.tools.push({
+                transactionId: tool.transactionId,
+                toolId: tool.toolId,
+                toolName: tool.toolName,
+                borrowedTime: tool.borrowedTime,
+                dueTime: tool.dueTime,
+                quantity: tool.quantity,
+                image: tool.image,
+            });
+            student.totalTools += 1;
+        });
+
+        return Array.from(studentMap.values());
+    }, [borrowedTools]);
+
+    // Group returned tools by student
+    const groupedReturnedStudents = useMemo((): GroupedStudent[] => {
+        const studentMap = new Map<string, GroupedStudent>();
+
+        returnedTools.forEach((tool) => {
+            if (!studentMap.has(tool.studentId)) {
+                studentMap.set(tool.studentId, {
+                    studentId: tool.studentId,
+                    studentName: tool.studentName,
+                    section: tool.section || "N/A",
+                    tools: [],
+                    totalTools: 0,
+                });
+            }
+
+            const student = studentMap.get(tool.studentId)!;
+            const foundTool = filteredTools.find((t) => t.id === tool.toolId);
+            student.tools.push({
+                transactionId: tool.id,
+                toolId: tool.toolId,
+                toolName: tool.toolName,
+                returnedAt: tool.returnedAt,
+                quantity: tool.quantity || 1,
+                image: foundTool?.image || "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?w=400",
+            });
+            student.totalTools += 1;
+        });
+
+        return Array.from(studentMap.values());
+    }, [returnedTools, filteredTools]);
+
     // Statistics
     const stats = [
         {
@@ -241,6 +303,17 @@ export function InstructorDashboard({ onNavigate }: InstructorDashboardProps) {
 
     const toggleToolSelection = (toolId: string) => {
         setSelectedTools((prev) => (prev.includes(toolId) ? prev.filter((id) => id !== toolId) : [...prev, toolId]));
+    };
+
+    // Bulk action handlers for grouped students
+    const handleReturnAllForStudent = (studentId: string, transactionIds: string[]) => {
+        transactionIds.forEach((id) => handleReturnTool(id));
+        toast.success(`All tools returned for student`);
+    };
+
+    const handleTurnoverAllForStudent = (studentId: string, transactionIds: string[]) => {
+        transactionIds.forEach((id) => handleTurnoverTool(id));
+        toast.success(`All tools turned over for student`);
     };
 
     // Chart Data for Dashboard
@@ -562,78 +635,54 @@ export function InstructorDashboard({ onNavigate }: InstructorDashboardProps) {
 
                 {/* Return Tool Tab */}
                 {activeTab === "return" && (
-                    <div className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle>Return Tools</CardTitle>
-                                <CardDescription>Mark borrowed tools as returned</CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <BorrowedToolsTable tools={borrowedTools} onReturn={handleReturnTool} />
-                            </CardContent>
-                        </Card>
-                    </div>
+                    <Card className="bg-white border-slate-200 shadow-sm">
+                        <CardHeader>
+                            <CardTitle>Return Tools</CardTitle>
+                            <CardDescription>
+                                Students with borrowed tools - expand to view and return individual tools
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <StudentToolsGroup
+                                students={groupedBorrowedStudents}
+                                mode="return"
+                                onActionSingle={handleReturnTool}
+                                onActionAll={handleReturnAllForStudent}
+                                emptyMessage="No tools currently borrowed"
+                            />
+                        </CardContent>
+                    </Card>
                 )}
 
                 {/* Turnover Tab */}
                 {activeTab === "turnover" && (
-                    <div className="space-y-6">
-                        <Card>
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <CardTitle>Turnover Tools to Admin</CardTitle>
-                                        <CardDescription>Mark returned tools as turned over</CardDescription>
-                                    </div>
-                                    {returnedTools.length > 0 && (
-                                        <Button onClick={() => handleTurnoverAll(INSTRUCTOR_ID)}>
-                                            <RefreshCw className="w-4 h-4 mr-2" />
-                                            Turnover All
-                                        </Button>
-                                    )}
+                    <Card className="bg-white border-slate-200 shadow-sm">
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <CardTitle>Turnover Tools to Admin</CardTitle>
+                                    <CardDescription>
+                                        Students with returned tools - expand to view and turnover individual tools
+                                    </CardDescription>
                                 </div>
-                            </CardHeader>
-                            <CardContent>
-                                {returnedTools.length === 0 ? (
-                                    <p className="text-center text-muted-foreground py-8">No tools ready for turnover</p>
-                                ) : (
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>Tool</TableHead>
-                                                <TableHead>Student</TableHead>
-                                                <TableHead>Qty</TableHead>
-                                                <TableHead>Returned At</TableHead>
-                                                <TableHead className="text-right">Action</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {returnedTools.map((tool) => (
-                                                <TableRow key={tool.id}>
-                                                    <TableCell>{tool.toolName}</TableCell>
-                                                    <TableCell>{tool.studentName}</TableCell>
-                                                    <TableCell>
-                                                        <Badge
-                                                            variant="outline"
-                                                            className="bg-blue-50 text-blue-700 border-blue-200"
-                                                        >
-                                                            {tool.quantity || 1}
-                                                        </Badge>
-                                                    </TableCell>
-                                                    <TableCell>{new Date(tool.returnedAt || "").toLocaleString()}</TableCell>
-                                                    <TableCell className="text-right">
-                                                        <Button size="sm" onClick={() => handleTurnoverTool(tool.id)}>
-                                                            Mark as Turned Over
-                                                        </Button>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                {returnedTools.length > 0 && (
+                                    <Button onClick={() => handleTurnoverAll(INSTRUCTOR_ID)}>
+                                        <RefreshCw className="w-4 h-4 mr-2" />
+                                        Turnover All Students
+                                    </Button>
                                 )}
-                            </CardContent>
-                        </Card>
-                    </div>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <StudentToolsGroup
+                                students={groupedReturnedStudents}
+                                mode="turnover"
+                                onActionSingle={handleTurnoverTool}
+                                onActionAll={handleTurnoverAllForStudent}
+                                emptyMessage="No tools ready for turnover"
+                            />
+                        </CardContent>
+                    </Card>
                 )}
 
                 {/* History Tab */}
