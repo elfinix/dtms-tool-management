@@ -1,5 +1,11 @@
 # 🛠️ DTMS - DPR Tool Management System
 
+> #### ⚠️ Disclaimer on Code Structure
+>
+> Some `.tsx` files (e.g., dashboard pages) are intentionally kept large on the `main` branch. This temporary monolithic structure ensures flexibility as backend logic and data structures continue to evolve. Once the backend stabilizes, these files will be modularized into smaller, reusable components.
+>
+> A `secondary` branch will be/is made available for a toned-down interface but more reusability-friendly.
+
 **Modern tool tracking and inventory management for DPR Aviation College**
 
 [![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://react.dev/)
@@ -573,10 +579,6 @@ This project is developed for **DPR Aviation College**.
 **Version:** 1.0.0
 **Last Updated:** October 18, 2025
 **Status:** ✅ Production Ready
-
-> #### ⚠️ Disclaimer on Code Structure
->
-> Some `.tsx` files (e.g., dashboard pages) are intentionally kept large. This temporary monolithic structure ensures flexibility as backend logic and data structures continue to evolve. Once the backend stabilizes, these files will be modularized into smaller, reusable components.
 
 ---
 

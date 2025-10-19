@@ -1,7 +1,7 @@
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
 import { Wrench, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 
@@ -27,8 +27,8 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back Button */}
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="mb-4"
           onClick={() => onNavigate('landing')}
         >
@@ -75,8 +75,8 @@ export function LoginPage({ onNavigate }: LoginPageProps) {
               </div>
             </div>
 
-            <Button 
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md" 
+            <Button
+              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-md"
               onClick={handleLogin}
             >
               Login

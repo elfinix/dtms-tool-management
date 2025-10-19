@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Label } from "./ui/label";
-import { Badge } from "./ui/badge";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Label } from "../components/ui/label";
+import { Badge } from "../components/ui/badge";
 import { ArrowLeft, Download, FileText, Calendar, TrendingUp, Award, Clock, Printer } from "lucide-react";
 import {
     BarChart,
@@ -84,7 +84,7 @@ export function ReportsPage({ onNavigate }: ReportsPageProps) {
 
         // Header
         doc.setFontSize(20);
-        doc.setTextColor(30, 64, 175); // Blue color
+        doc.setTextColor(30, 64, 175);
         doc.text("DPR Tool Management System", 14, 20);
 
         doc.setFontSize(14);

@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Label } from "./ui/label";
-import { Badge } from "./ui/badge";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Label } from "../ui/label";
+import { Badge } from "../ui/badge";
 import { Download, FileText, TrendingUp, Award, Clock, Calendar } from "lucide-react";
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
-import { useAppContext } from "./AppContext";
+import { useAppContext } from "../../contexts/AppContext";
 
 export function AdminReportsTab() {
   const { tools, transactions } = useAppContext();
